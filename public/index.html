@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SHIMONA CASINO</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#090910;color:#f4f2fa;font:16px Arial,sans-serif}
+main{max-width:650px;margin:auto;padding:20px 14px}
+header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+h1{font-size:22px;letter-spacing:2px}
+h1 span{color:#a78bfa}
+.balance{background:#1a1725;padding:12px;border-radius:12px;border:1px solid #41335f;font-weight:bold}
+.note{color:#aaa5b9;font-size:13px;line-height:1.5}
+nav{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:20px 0}
+button,select,input{font:inherit}
+button{cursor:pointer}
+nav button,.choice{background:#191823;color:#ddd;border:1px solid #343044;border-radius:10px;padding:12px 3px}
+nav button.active{background:#35264f;border-color:#9270db}
+.panel{display:none;background:#14131c;border:1px solid #302b3d;border-radius:16px;padding:16px}
+.panel.active{display:block}
+h2{margin:0 0 8px}
+label{display:block;margin:14px 0;color:#bbb5c9;font-size:13px}
+input,select{display:block;width:100%;margin-top:7px;padding:12px;background:#090910;color:white;border:1px solid #3b3549;border-radius:9px}
+.primary{width:100%;padding:14px;margin-top:12px;background:#7653bd;color:white;border:0;border-radius:10px;font-weight:bold}
+.result{white-space:pre-line;margin-top:14px;padding:12px;background:#090910;border:1px solid #302b3d;border-radius:10px;min-height:45px}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:14px}
+.cell{aspect-ratio:1;background:#272035;color:#ddd;border:1px solid #49405b;border-radius:8px;font-size:22px}
+.reels{display:flex;justify-content:center;gap:9px;margin:22px 0}
+.reel{width:80px;height:80px;display:grid;place-items:center;background:#090910;border:1px solid #40364f;border-radius:12px;font-size:35px}
+.spinning{animation:spin .16s infinite alternate}
+@keyframes spin{to{transform:translateY(-5px);filter:brightness(1.6)}}
+.wheel{width:145px;height:145px;border-radius:50%;margin:20px auto;display:grid;place-items:center;font-size:22px;border:6px solid #44345f;background:conic-gradient(#982d47 0 30deg,#171620 30deg 60deg,#982d47 60deg 90deg,#171620 90deg 120deg,#982d47 120deg 150deg,#171620 150deg 180deg,#982d47 180deg 210deg,#171620 210deg 240deg,#982d47 240deg 270deg,#171620 270deg 300deg,#982d47 300deg 330deg,#171620 330deg);transition:transform 2s cubic-bezier(.12,.68,.12,1)}
+.cards{display:flex;justify-content:center;gap:8px;margin:16px 0}
+.card{width:56px;height:76px;border-radius:8px;background:#f3f0fa;color:#191620;display:grid;place-items:center;font-size:25px;font-weight:bold}
+footer{text-align:center;color:#777184;font-size:12px;margin-top:25px}
+</style>
+</head>
+<body>
+<main>
+<header><h1>SHIMONA <span>CASINO</span></h1><div class="balance"><span id="balance">500</span> SB</div></header>
+<p class="note">Только бесплатные виртуальные очки. Реальных денег, покупок и выводов нет.</p>
+<nav>
+<button class="active" data-tab="mines">💣 Мины</button>
+<button data-tab="slots">🎰 Слоты</button>
+<button data-tab="roulette">🎡 Рулетка</button>
+<button data-tab="blackjack">🃏 21</button>
+</nav>
+
+<section class="panel active" id="mines">
+<h2>💣 Мины</h2><p class="note">Выбери количество мин и клеток. Это упрощённый раунд.</p>
+<label>Ставка SB<input id="minesBet" type="number" min="1" max="10000" value="10"></label>
+<label>Количество мин<select id="mineCount"><option>3</option><option>5</option><option>8</option><option>10</option><option>15</option><option>20</option></select></label>
+<label>Количество клеток<select id="picks"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label>
+<div class="grid" id="grid"></div>
+<button class="primary" id="playMines">Открыть клетки</button>
+<div class="result" id="minesResult">Готов к игре.</div>
+</section>
+
+<section class="panel" id="slots">
+<h2>🎰 Слоты</h2><p class="note">Три барабана. Совпадения дают виртуальную выплату.</p>
+<label>Ставка SB<input id="slotsBet" type="number" min="1" max="10000" value="10"></label>
+<div class="reels"><div class="reel">🍒</div><div class="reel">🔔</div><div class="reel">💎</div></div>
+<button class="primary" id="playSlots">Крутить</button><div class="result" id="slotsResult">Удачи!</div>
+</section>
+
+<section class="panel" id="roulette">
+<h2>🎡 Рулетка</h2><p class="note">Выбери цвет или диапазон чисел.</p>
+<label>Ставка SB<input id="rouletteBet" type="number" min="1" max="10000" value="10"></label>
+<label>Выбор<select id="rouletteChoice"><option value="red">Красное</option><option value="black">Чёрное</option><option value="green">Зелёное (0)</option><option value="even">Чётное</option><option value="odd">Нечётное</option><option value="low">1–18</option><option value="high">19–36</option></select></label>
+<div class="wheel" id="wheel">SHI</div>
+<button class="primary" id="playRoulette">Крутить рулетку</button><div class="result" id="rouletteResult">Сделай выбор.</div>
+</section>
+
+<section class="panel" id="blackjack">
+<h2>🃏 Блэкджек</h2><p class="note">Упрощённая версия: результат определяется автоматически.</p>
+<label>Ставка SB<input id="blackjackBet" type="number" min="1" max="10000" value="10"></label>
+<div class="cards" id="playerCards"></div><div id="totals" class="note" style="text-align:center">Твои карты против дилера</div><div class="cards" id="dealerCards"></div>
+<button class="primary" id="playBlackjack">Раздать карты</button><div class="result" id="blackjackResult">Готов к раунду.</div>
+</section>
+
+<section class="panel active" style="display:block;margin-top:14px">
+<h2>🎁 Ежедневный бонус</h2><p class="note">100 SB один раз в 24 часа.</p>
+<button class="primary" id="bonus">Забрать бонус</button><div class="result" id="bonusResult">Бонус проверяется сервером.</div>
+</section>
+<footer>SHIMONA CASINO • Виртуальные SB • Демо</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let pid=localStorage.getItem("shimonaPlayer");
+if(!pid){pid="player-"+Math.random().toString(36).slice(2,12);localStorage.setItem("shimonaPlayer",pid)}
+const headers={"Content-Type":"application/json","X-Player-Id":pid};
+async function api(url,body){const r=await fetch(url,{method:body?"POST":"GET",headers,body:body?JSON.stringify(body):undefined});const d=await r.json();if(!r.ok||!d.ok)throw Error(d.error||"Ошибка");return d}
+function setBalance(n){$("balance").textContent=n}
+function result(id,s){$(id).textContent=s}
+function bet(id){let n=Number($(id).value);if(!Number.isInteger(n)||n<1||n>10000)throw Error("Ставка должна быть от 1 до 10000 SB.");return n}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".panel").forEach(x=>{if(["mines","slots","roulette","blackjack"].includes(x.id))x.classList.toggle("active",x.id===b.dataset.tab)})});
+for(let i=0;i<25;i++){let b=document.createElement("button");b.className="cell";b.textContent="·";b.onclick=()=>b.textContent=b.textContent==="·"?"?":"·";$("grid").append(b)}
+$("playMines").onclick=async()=>{try{let d=await api("/api/mines",{bet:bet("minesBet"),mines:+$("mineCount").value,picks:+$("picks").value});setBalance(d.balance);result("minesResult",`${d.message}\nКлеток безопасно: ${d.safe}\nКоэффициент: ${d.multiplier}x\nВыплата: ${d.payout} SB; итог: ${d.net>=0?"+":""}${d.net} SB`)}catch(e){result("minesResult",e.message)}};
+$("playSlots").onclick=async()=>{let reels=[...document.querySelectorAll("#slots .reel")];try{reels.forEach(x=>x.classList.add("spinning"));await new Promise(r=>setTimeout(r,900));let d=await api("/api/slots",{bet:bet("slotsBet")});d.reels.forEach((s,i)=>reels[i].textContent=s);setBalance(d.balance);result("slotsResult",`${d.message}\nВыплата: ${d.payout} SB; итог: ${d.net>=0?"+":""}${d.net} SB`)}catch(e){result("slotsResult",e.message)}finally{reels.forEach(x=>x.classList.remove("spinning"))}};
+$("playRoulette").onclick=async()=>{try{$("wheel").style.transform=`rotate(${1080+Math.random()*720}deg)`;await new Promise(r=>setTimeout(r,800));let d=await api("/api/roulette",{bet:bet("rouletteBet"),choice:$("rouletteChoice").value});setBalance(d.balance);result("rouletteResult",`${d.message}\nВыпало: ${d.number} (${d.color})\nВыплата: ${d.payout} SB; итог: ${d.net>=0?"+":""}${d.net} SB`)}catch(e){result("rouletteResult",e.message)}};
+$("playBlackjack").onclick=async()=>{try{let d=await api("/api/blackjack",{bet:bet("blackjackBet")});setBalance(d.balance);$("playerCards").innerHTML=d.playerCards.map(n=>`<div class="card">${n}</div>`).join("");$("dealerCards").innerHTML=d.dealerCards.map(n=>`<div class="card">${n}</div>`).join("");$("totals").textContent=`Твои очки: ${d.playerTotal} • Дилер: ${d.dealerTotal}`;result("blackjackResult",`${d.message}\nВыплата: ${d.payout} SB; итог: ${d.net>=0?"+":""}${d.net} SB`)}catch(e){result("blackjackResult",e.message)}};
+$("bonus").onclick=async()=>{try{let d=await api("/api/bonus",{});setBalance(d.balance);result("bonusResult",`Получено ${d.bonus} SB!`)}catch(e){result("bonusResult",e.message)}};
+async function refresh(){try{let d=await api("/api/me");setBalance(d.balance);if(!d.bonusReady){$("bonus").disabled=true;result("bonusResult","Бонус уже получен. Возвращайся через 24 часа.")}}catch(e){console.log(e)}}
+refresh();
+</script>
+</body>
+  </html>
+  
