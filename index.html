@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SHIMONA</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b0b0b;color:#f3d58a;font-family:Arial,sans-serif}
+main{max-width:480px;margin:auto;padding:24px}
+header{text-align:center;padding:32px 0}
+h1{letter-spacing:5px}
+.card{background:#171717;border:1px solid #665025;border-radius:16px;padding:20px;margin:14px 0}
+.balance{font-size:32px;font-weight:bold;margin:12px 0}
+button{width:100%;padding:15px;margin-top:10px;background:#c5a04b;color:#111;border:0;border-radius:10px;font-size:16px;font-weight:bold}
+.small{color:#aaa;font-size:13px}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>SHIMONA</h1>
+<div>VIRTUAL CLUB</div>
+</header>
+<section class="card">
+<div>ТВОЙ БАЛАНС</div>
+<div class="balance" id="balance">10 000 SB</div>
+<div class="small">Виртуальные баллы для развлечения</div>
+</section>
+<section class="card">
+<h3>ЕЖЕДНЕВНЫЙ БОНУС</h3>
+<p>Забери награду дня</p>
+<button onclick="bonus()">Получить +500 SB</button>
+<p id="message" class="small"></p>
+</section>
+<section class="card">
+<h3>ИГРОВОЙ КЛУБ</h3>
+<p>Викторина • Числа • Задания</p>
+<button onclick="challenge()">Испытание дня</button>
+<p id="challenge" class="small"></p>
+</section>
+<p class="small">SB — виртуальные баллы без денежной стоимости.</p>
+</main>
+<script>
+let balance=10000;
+function bonus(){
+ const today=new Date().toDateString();
+ if(localStorage.getItem('bonusDate')===today){
+ document.getElementById('message').textContent='Бонус уже получен сегодня.';
+ return;
+ }
+ balance+=500;
+ localStorage.setItem('bonusDate',today);
+ document.getElementById('balance').textContent=balance.toLocaleString('ru-RU')+' SB';
+ document.getElementById('message').textContent='Начислено +500 SB!';
+}
+function challenge(){
+ document.getElementById('challenge').textContent=
+ 'Твоё число: '+(Math.floor(Math.random()*5)+1)+'. Попробуй снова завтра!';
+}
+</script>
+</body>
+</html>
