@@ -4,61 +4,272 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SHIMONA</title>
+<meta name="theme-color" content="#090909">
+<title>SHIMONA — Virtual Club</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
+:root{--bg:#090909;--panel:#151515;--gold:#d6ad52;--muted:#969696;--line:#40331b}
 *{box-sizing:border-box}
-body{margin:0;background:#0b0b0b;color:#f3d58a;font-family:Arial,sans-serif}
-main{max-width:480px;margin:auto;padding:24px}
-header{text-align:center;padding:32px 0}
-h1{letter-spacing:5px}
-.card{background:#171717;border:1px solid #665025;border-radius:16px;padding:20px;margin:14px 0}
-.balance{font-size:32px;font-weight:bold;margin:12px 0}
-button{width:100%;padding:15px;margin-top:10px;background:#c5a04b;color:#111;border:0;border-radius:10px;font-size:16px;font-weight:bold}
-.small{color:#aaa;font-size:13px}
+body{margin:0;background:var(--bg);color:#f5f0e5;font-family:Arial,sans-serif}
+button{font:inherit;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+.app{max-width:500px;margin:auto;padding:18px 15px 35px}
+header{text-align:center;padding:22px 0}
+.logo{font-size:30px;letter-spacing:7px;color:var(--gold);font-weight:900}
+.sub{font-size:10px;letter-spacing:4px;color:#aaa;margin-top:8px}
+.card{background:linear-gradient(145deg,#191919,#101010);border:1px solid var(--line);border-radius:16px;padding:17px;margin:12px 0}
+.muted{color:var(--muted);font-size:12px}
+.balance{font-size:35px;color:var(--gold);font-weight:bold;margin:9px 0}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+h2{font-size:17px;margin:0 0 12px}
+h3{font-size:14px;margin:0 0 8px}
+button,.btn{border:1px solid #755c29;background:#bd9645;color:#100e09;border-radius:10px;padding:12px;font-weight:bold}
+.primary{width:100%;margin-top:10px}
+.secondary{background:#222;color:#f0d18a;border-color:#504124}
+button:active{transform:scale(.98)}
+.nav{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:15px 0}
+.nav button{background:#181818;color:#bbb;padding:11px 2px;font-size:11px;border-color:#292929}
+.nav button.active{color:var(--gold);border-color:var(--gold)}
+.page{display:none}.page.active{display:block}
+.game-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.game{border:1px solid var(--line);background:#171717;color:white;border-radius:13px;padding:17px 10px;text-align:left;min-height:110px}
+.emoji{font-size:27px;display:block;margin-bottom:12px}
+.game b{color:var(--gold);font-size:14px}
+.game small{display:block;color:#999;margin-top:6px;font-size:11px}
+.notice{padding:10px;background:#211d14;border-radius:9px;color:#c9b783;font-size:12px;line-height:1.5}
+#board{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:15px 0}
+.tile{padding:0;aspect-ratio:1;background:#272319;color:var(--gold);border:1px solid #5b4926;border-radius:8px;font-size:20px}
+.tile.open{background:#183127;border-color:#315d43}
+.tile.mine{background:#402020}
+.controls{display:flex;gap:8px;margin:10px 0}
+.controls>*{flex:1;min-width:0}
+input,select{width:100%;background:#0d0d0d;color:white;border:1px solid #493a20;border-radius:9px;padding:12px;margin:7px 0}
+.big-result{text-align:center;font-size:40px;padding:20px;color:var(--gold)}
+.reels{display:flex;justify-content:center;gap:12px;font-size:44px;padding:20px 0}
+.cards{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:15px 0}
+.playing-card{background:#eee;color:#171717;border-radius:9px;padding:14px 8px;font-size:20px;min-width:45px;text-align:center}
+.log{font-size:12px;color:#aaa;line-height:1.8}
+footer{text-align:center;color:#666;font-size:11px;padding:20px 0}
 </style>
 </head>
 <body>
-<main>
+<div class="app">
 <header>
-<h1>SHIMONA</h1>
-<div>VIRTUAL CLUB</div>
+<div class="logo">SHIMONA</div>
+<div class="sub">VIRTUAL CLUB · SB EDITION</div>
 </header>
+
 <section class="card">
-<div>ТВОЙ БАЛАНС</div>
-<div class="balance" id="balance">10 000 SB</div>
-<div class="small">Виртуальные баллы для развлечения</div>
+<div class="row"><span class="muted">ИГРОВОЙ ПРОФИЛЬ</span><span class="muted" id="level">Уровень 1</span></div>
+<h2 id="player">Игрок</h2>
+<div class="muted">Твой виртуальный баланс</div>
+<div class="balance"><span id="balance">1000</span> <span style="font-size:16px">SB</span></div>
+<div class="row muted"><span>Достижения: <b id="achievements">0</b></span><span>Раунды: <b id="rounds">0</b></span></div>
 </section>
-<section class="card">
-<h3>ЕЖЕДНЕВНЫЙ БОНУС</h3>
-<p>Забери награду дня</p>
-<button onclick="bonus()">Получить +500 SB</button>
-<p id="message" class="small"></p>
+
+<div class="nav">
+<button class="active" data-page="home">Главная</button>
+<button data-page="games">Игры</button>
+<button data-page="bonus">Бонус</button>
+<button data-page="history">История</button>
+</div>
+
+<section id="home" class="page active">
+<div class="card">
+<h2>Добро пожаловать</h2>
+<p class="muted">Выполняй испытания, играй в мини-игры и собирай виртуальные SB.</p>
+<div class="notice">SB — игровые баллы без денежной стоимости. Они не покупаются и не обмениваются на деньги.</div>
+<button class="primary" onclick="showPage('games')">Открыть игры</button>
+</div>
+<div class="card">
+<h3>Задание дня</h3>
+<p id="dailyText" class="muted">Заверши один игровой раунд и получи награду.</p>
+<button class="primary" id="taskBtn" onclick="claimTask()">Получить награду за задание · +100 SB</button>
+</div>
 </section>
-<section class="card">
-<h3>ИГРОВОЙ КЛУБ</h3>
-<p>Викторина • Числа • Задания</p>
-<button onclick="challenge()">Испытание дня</button>
-<p id="challenge" class="small"></p>
+
+<section id="games" class="page">
+<h2>Игровой зал</h2>
+<div class="game-grid">
+<button class="game" onclick="showPage('mines')"><span class="emoji">💎</span><b>Мины</b><small>Найди безопасные клетки</small></button>
+<button class="game" onclick="showPage('slots')"><span class="emoji">🎰</span><b>Слоты</b><small>Собери комбинацию</small></button>
+<button class="game" onclick="showPage('wheel')"><span class="emoji">🎡</span><b>Колесо удачи</b><small>Бесплатный раунд</small></button>
+<button class="game" onclick="showPage('cards')"><span class="emoji">🂡</span><b>21 очко</b><small>Карточное испытание</small></button>
+</div>
+<p class="muted">Игры бесплатные. Награды выдаются за достижения, а не за ставки.</p>
 </section>
-<p class="small">SB — виртуальные баллы без денежной стоимости.</p>
-</main>
+
+<section id="bonus" class="page">
+<div class="card">
+<div class="big-result">✦</div>
+<h2 style="text-align:center">Ежедневный бонус</h2>
+<p class="muted" style="text-align:center">Забирай 100 SB один раз в день.</p>
+<button class="primary" id="bonusBtn" onclick="claimBonus()">Получить +100 SB</button>
+<p id="bonusMsg" class="muted"></p>
+</div>
+</section>
+
+<section id="mines" class="page">
+<div class="card">
+<h2>💎 Мины — поиск кристаллов</h2>
+<p class="muted">Открой безопасные клетки. За каждый новый безопасный ход получишь 10 SB. Мины не отнимают баллы.</p>
+<div class="row"><span>Найдено: <b id="found">0</b></span><span>Награды: <b id="mineScore">0 SB</b></span></div>
+<div id="board"></div>
+<button class="primary" onclick="startMines()">Новое поле</button>
+<p id="mineMsg" class="muted"></p>
+</div>
+</section>
+
+<section id="slots" class="page">
+<div class="card">
+<h2>🎰 Слоты — символы</h2>
+<p class="muted">Бесплатный раунд. Одинаковые символы дают награду, разные — возможность попробовать ещё раз.</p>
+<div class="reels"><span id="r1">🍒</span><span id="r2">⭐</span><span id="r3">🔔</span></div>
+<button class="primary" id="slotBtn" onclick="spinSlots()">Запустить раунд</button>
+<p id="slotMsg" class="muted"></p>
+</div>
+</section>
+
+<section id="wheel" class="page">
+<div class="card">
+<h2>🎡 Колесо удачи</h2>
+<p class="muted">Один бесплатный раунд в день. Награда определяется случайно.</p>
+<div class="big-result" id="wheelIcon">✦</div>
+<button class="primary" id="wheelBtn" onclick="spinWheel()">Вращать колесо</button>
+<p id="wheelMsg" class="muted"></p>
+</div>
+</section>
+
+<section id="cards" class="page">
+<div class="card">
+<h2>🂡 21 очко — карточное испытание</h2>
+<p class="muted">Набери как можно ближе к 21. За результат 15 и выше начисляются SB. Баллы за проигрыш не снимаются.</p>
+<div class="muted">Твои карты</div><div id="playerCards" class="cards"></div>
+<div class="muted">Сумма: <b id="playerTotal">0</b></div>
+<div class="muted">Карты соперника</div><div id="dealerCards" class="cards"></div>
+<div class="muted">Сумма: <b id="dealerTotal">?</b></div>
+<div class="controls"><button id="hitBtn" onclick="hit()">Ещё карту</button><button id="standBtn" class="secondary" onclick="stand()">Завершить</button></div>
+<button class="primary" id="newCardBtn" onclick="newCards()">Новый раунд</button>
+<p id="cardMsg" class="muted"></p>
+</div>
+</section>
+
+<section id="history" class="page">
+<div class="card">
+<h2>История активности</h2>
+<div id="historyLog" class="log">Пока записей нет.</div>
+</div>
+</section>
+
+<footer>SHIMONA · VIRTUAL POINTS ONLY<br>Нет денежных ставок, пополнений или выводов.</footer>
+</div>
 <script>
-let balance=10000;
-function bonus(){
- const today=new Date().toDateString();
- if(localStorage.getItem('bonusDate')===today){
- document.getElementById('message').textContent='Бонус уже получен сегодня.';
- return;
- }
- balance+=500;
- localStorage.setItem('bonusDate',today);
- document.getElementById('balance').textContent=balance.toLocaleString('ru-RU')+' SB';
- document.getElementById('message').textContent='Начислено +500 SB!';
+const tg=window.Telegram?.WebApp;
+if(tg){tg.ready();tg.expand();}
+const $=id=>document.getElementById(id);
+const symbols=["🍒","🍋","⭐","🔔","💎","7️⃣"];
+let data;
+try{data=JSON.parse(localStorage.getItem("shimona_v2"))}catch(e){}
+if(!data||typeof data.balance!=="number")data={balance:1000,rounds:0,achievements:0,history:[],bonus:"",wheel:"",task:"",minesDaily:""};
+function save(){localStorage.setItem("shimona_v2",JSON.stringify(data));render();}
+function render(){
+$("balance").textContent=data.balance.toLocaleString("ru-RU");
+$("rounds").textContent=data.rounds;
+$("achievements").textContent=data.achievements;
+$("level").textContent="Уровень "+(1+Math.floor(data.achievements/5));
+$("player").textContent=tg?.initDataUnsafe?.user?.first_name||"Игрок";
+$("bonusBtn").disabled=data.bonus===today();
+$("bonusMsg").textContent=data.bonus===today()?"Бонус уже получен сегодня.":"";
+$("wheelBtn").disabled=data.wheel===today();
+$("wheelMsg").textContent=data.wheel===today()?"Сегодняшний раунд уже использован.":"";
+$("taskBtn").disabled=data.task===today();
+$("taskBtn").textContent=data.task===today()?"Задание выполнено":"Получить награду за задание · +100 SB";
+$("historyLog").innerHTML=data.history.length?data.history.slice(0,20).map(x=>"<div>"+escapeHtml(x)+"</div>").join(""):"Пока записей нет.";
 }
-function challenge(){
- document.getElementById('challenge').textContent=
- 'Твоё число: '+(Math.floor(Math.random()*5)+1)+'. Попробуй снова завтра!';
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function today(){return new Date().toLocaleDateString("en-CA");}
+function log(s){data.history.unshift(new Date().toLocaleTimeString("ru-RU",{hour:"2-digit",minute:"2-digit"})+" · "+s);data.history=data.history.slice(0,50);}
+function award(n,reason){data.balance+=n;data.achievements++;log(reason+" +"+n+" SB");save();}
+function showPage(id){
+document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+$(id).classList.add("active");
+document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
+if(id==="mines"&&!mines.started)startMines();
 }
+document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
+function claimBonus(){if(data.bonus===today())return;data.bonus=today();award(100,"Ежедневный бонус");}
+function claimTask(){if(data.task===today())return;data.task=today();award(100,"Задание дня");}
+
+let mines={started:false,found:0,seen:[],positions:[]};
+function startMines(){
+mines={started:true,found:0,seen:[],positions:[]};
+while(mines.positions.length<5){let n=Math.floor(Math.random()*25);if(!mines.positions.includes(n))mines.positions.push(n);}
+$("found").textContent="0";$("mineScore").textContent="0 SB";$("mineMsg").textContent="Найди кристаллы!";
+$("board").innerHTML="";
+for(let i=0;i<25;i++){let b=document.createElement("button");b.className="tile";b.textContent="·";b.onclick=()=>openTile(i,b);$("board").appendChild(b);}
+}
+function openTile(i,b){
+if(!mines.started||mines.seen.includes(i))return;
+mines.seen.push(i);
+if(mines.positions.includes(i)){b.classList.add("mine");b.textContent="✦";$("mineMsg").textContent="Мина найдена! Начни новое поле. Награды сохранены.";mines.started=false;return;}
+b.classList.add("open");b.textContent="💎";mines.found++;
+award(10,"Кристалл найден");$("found").textContent=mines.found;$("mineScore").textContent=(mines.found*10)+" SB";
+if(mines.found===20){$("mineMsg").textContent="Поле полностью пройдено!";mines.started=false;}
+}
+
+function spinSlots(){
+let a=[0,1,2].map(()=>symbols[Math.floor(Math.random()*symbols.length)]);
+$("r1").textContent=a[0];$("r2").textContent=a[1];$("r3").textContent=a[2];
+data.rounds++;
+if(a[0]===a[1]&&a[1]===a[2]){award(50,"Три одинаковых символа");$("slotMsg").textContent="Отлично! +50 SB";}
+else if(a[0]===a[1]||a[1]===a[2]||a[0]===a[2]){award(20,"Пара символов");$("slotMsg").textContent="Есть пара! +20 SB";}
+else{$("slotMsg").textContent="Попробуй ещё раз — баллы сохранены.";}
+save();
+}
+function spinWheel(){
+if(data.wheel===today())return;
+data.wheel=today();
+let prizes=[10,20,30,50,100],p=prizes[Math.floor(Math.random()*prizes.length)];
+$("wheelIcon").textContent=["✦","★","◆","♛","✧"][prizes.indexOf(p)];
+$("wheelMsg").textContent="Твоя награда: "+p+" SB";
+award(p,"Колесо удачи");
+}
+
+const deckValues=[1,2,3,4,5,6,7,8,9,10,10,10,10];
+let game={p:[],d:[],over:true};
+function draw(){return deckValues[Math.floor(Math.random()*deckValues.length)];}
+function total(cards){return cards.reduce((a,b)=>a+b,0);}
+function showCards(){
+$("playerCards").innerHTML=game.p.map(v=>'<span class="playing-card">'+(v===1?"A":v)+'</span>').join("");
+$("dealerCards").innerHTML=game.d.map(v=>'<span class="playing-card">'+(v===1?"A":v)+'</span>').join("");
+$("playerTotal").textContent=total(game.p);
+$("dealerTotal").textContent=game.over?total(game.d):"?";
+$("hitBtn").disabled=game.over;$("standBtn").disabled=game.over;
+}
+function newCards(){
+game={p:[draw(),draw()],d:[draw(),draw()],over:false};
+$("cardMsg").textContent="Твой ход.";
+showCards();
+}
+function finishCards(){
+game.over=true;
+let p=total(game.p),d=total(game.d);
+while(d<17){game.d.push(draw());d=total(game.d);}
+let reward=0;
+if(p<=21&&(d>21||p>d))reward=30;
+else if(p===d&&p<=21)reward=10;
+if(reward){award(reward,"Карточное испытание");$("cardMsg").textContent="Раунд завершён! Награда "+reward+" SB.";}
+else{$("cardMsg").textContent="Раунд завершён. Баллы сохранены.";}
+data.rounds++;save();showCards();
+}
+function hit(){
+if(game.over)return;
+game.p.push(draw());
+if(total(game.p)>=21)finishCards();else showCards();
+}
+function stand(){if(!game.over)finishCards();}
+render();startMines();newCards();
 </script>
 </body>
-</html>
+ </html>
+ 
