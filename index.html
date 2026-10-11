@@ -2,630 +2,261 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TG Virtual Casino</title>
-    <!-- Подключаем Telegram SDK -->
-    <script src="https://telegram.org"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHIMONA CASINO — МИНЫ</title>
     <style>
-        :root {
-            --bg-color: #0f0f13;
-            --card-color: #1a1b23;
-            --accent-color: #ffb700;
-            --text-color: #ffffff;
-            --success-color: #00e676;
-            --danger-color: #ff3d00;
-        }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            user-select: none;
-            -webkit-user-select: none;
-            overflow-x: hidden;
-        }
-
-        /* Шапка с балансом */
-        .header {
-            background: var(--card-color);
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #282a36;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--accent-color);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .balance-container {
-            background: #252733;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            border: 1px solid var(--accent-color);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* Экраны / Окна */
-        .screen {
-            display: none;
-            padding: 15px;
-            max-width: 500px;
-            margin: 0 auto;
-            box-sizing: border-box;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        /* Сетка Лобби */
-        .lobby-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .game-card {
-            background: var(--card-color);
-            border-radius: 15px;
-            padding: 20px;
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-align: center;
-            border: 1px solid #282a36;
-            cursor: pointer;
-            transition: transform 0.1s, border-color 0.2s;
+            margin: 0;
+            padding: 20px;
         }
-
-        .game-card:active {
-            transform: scale(0.95);
-            border-color: var(--accent-color);
+        .casino-header {
+            background: linear-gradient(145deg, #1a1a1a, #222);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
-
-        .game-card .icon {
-            font-size: 40px;
-            margin-bottom: 10px;
+        h2 { margin: 0 0 10px 0; color: #ffcc00; }
+        .balance-box { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
+        .balance-value { color: #ffcc00; }
+        
+        .controls {
+            background-color: #1a1a1a;
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
         }
-
-        .game-card .title {
-            font-weight: bold;
-            font-size: 16px;
-        }
-
-        /* Общие компоненты игр */
-        .btn {
-            background: var(--accent-color);
-            color: #000;
-            border: none;
-            padding: 12px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 10px;
-            cursor: pointer;
+        .input-group { display: flex; gap: 10px; width: 100%; max-width: 300px; }
+        input, select {
             width: 100%;
-            box-sizing: border-box;
-            margin-top: 10px;
-            transition: opacity 0.2s;
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-danger { background: var(--danger-color); color: white; }
-        .btn-success { background: var(--success-color); color: white; }
-        .btn-secondary { background: #444; color: white; }
-
-        .input-group {
-            margin: 15px 0;
-            text-align: left;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #aaa;
-            font-size: 14px;
-        }
-
-        .input-group input {
-            width: 100%;
-            background: #252733;
-            border: 1px solid #3d4052;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #333;
+            background-color: #2a2a2a;
             color: white;
-            padding: 12px;
-            border-radius: 8px;
             font-size: 16px;
-            box-sizing: border-box;
         }
-
+        
+        .btn-main {
+            background-color: #ffcc00;
+            color: #121212;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            max-width: 300px;
+            transition: 0.2s;
+        }
+        .btn-main:disabled { background-color: #555; color: #aaa; cursor: not-allowed; }
+        
         .status-box {
-            background: #1a1b23;
-            padding: 12px;
-            border-radius: 10px;
             margin: 15px 0;
+            font-size: 16px;
             min-height: 24px;
-            font-weight: 500;
-            border-left: 4px solid var(--accent-color);
+            color: #00ffcc;
         }
 
-        /* МИНЫ: Сетка поля */
-        .mines-grid {
+        .grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 8px;
-            margin: 15px 0;
+            max-width: 340px;
+            margin: 0 auto 20px auto;
         }
-
-        .mine-cell {
+        .cell {
             aspect-ratio: 1;
-            background: #252733;
+            background-color: #2a2a2a;
+            border: 1px solid #3a3a3a;
             border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            border: 1px solid #3d4052;
-        }
-
-        .mine-cell.opened { background: #1f3a2b; border-color: var(--success-color); }
-        .mine-cell.exploded { background: #3a1f1f; border-color: var(--danger-color); }
-
-        /* ОРЁЛ И РЕШКА */
-        .coin-flip-zone {
-            perspective: 1000px;
-            margin: 30px auto;
-            width: 120px;
-            height: 120px;
-        }
-
-        .coin {
-            width: 100%;
-            height: 100%;
-            background: var(--accent-color);
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 45px;
-            color: #000;
-            box-shadow: 0 0 20px rgba(255, 183, 0, 0.4);
-            transition: transform 0.5s;
+            cursor: pointer;
+            transition: 0.1s;
         }
-
-        .coin-options {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .opt-btn {
-            flex: 1;
-            background: #252733;
-            border: 2px solid #3d4052;
-            color: white;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: bold;
-        }
-
-        .opt-btn.selected {
-            border-color: var(--accent-color);
-            background: rgba(255, 183, 0, 0.1);
-        }
-
-        /* КАРТОЧНЫЕ ИГРЫ (Блэкджек и 21) */
-        .cards-display {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin: 15px 0;
-            min-height: 90px;
-            flex-wrap: wrap;
-        }
-
-        .card {
-            background: white;
-            color: black;
-            width: 60px;
-            height: 90px;
-            border-radius: 6px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 5px;
-            box-sizing: border-box;
-            font-weight: bold;
-            font-size: 18px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-        .card.red { color: #ff3d00; }
-
-        .game-zone {
-            background: var(--card-color);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
+        .cell:hover { background-color: #333; }
+        .cell.opened-gem { background-color: #1b3a24; border-color: #2ecc71; }
+        .cell.opened-mine { background-color: #4a1515; border-color: #e74c3c; }
+        .cell.disabled { cursor: not-allowed; pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <!-- ШАПКА -->
-    <div class="header">
-        <div class="logo" onclick="showScreen('lobby')">🎰 TG Casino</div>
-        <div class="balance-container">🪙 <span id="user-balance">1000</span></div>
+    <div class="casino-header">
+        <h2>🎰 SHIMONA CASINO 🎰</h2>
+        <div class="balance-box">Баланс: <span id="balance" class="balance-value">5000</span> SB</div>
     </div>
 
-    <!-- ЭКРАН 1: ЛОББИ -->
-    <div id="lobby" class="screen active">
-        <h2 style="text-align: center; margin-top: 10px;">Выберите игру</h2>
-        <div class="lobby-grid">
-            <div class="game-card" onclick="initMines()">
-                <div class="icon">💣</div>
-                <div class="title">Мины</div>
-            </div>
-            <div class="game-card" onclick="initCoinFlip()">
-                <div class="icon">🪙</div>
-                <div class="title">Орёл / Решка</div>
-            </div>
-            <div class="game-card" onclick="initBlackjack()">
-                <div class="icon">🃏</div>
-                <div class="title">Блэкджек</div>
-            </div>
-            <div class="game-card" onclick="initTwentyOne()">
-                <div class="icon">🔥</div>
-                <div class="title">21 Очко</div>
-            </div>
+    <!-- Блок настроек ставки -->
+    <div class="controls" id="setup-panel">
+        <div class="input-group">
+            <input type="number" id="bet-input" placeholder="Ваша ставка" value="1000" min="1">
         </div>
-        <button class="btn btn-secondary" style="margin-top: 40px;" onclick="resetGlobalBalance()">Пополнить баланс (Демо)</button>
+        <div class="input-group">
+            <select id="mines-input">
+                <option value="3">3 мины</option>
+                <option value="5">5 мин</option>
+                <option value="8" selected>8 мин</option>
+                <option value="10">10 мин</option>
+                <option value="15">15 мин</option>
+            </select>
+        </div>
+        <button class="btn-main" onclick="startNewGame()">Начать игру</button>
     </div>
 
-    <!-- ЭКРАН 2: МИНЫ -->
-    <div id="game-mines" class="screen">
-        <button class="btn btn-secondary" onclick="showScreen('lobby')">⬅ В лобби</button>
-        <h3>💣 Игра: Мины</h3>
-        <div class="input-group">
-            <label>Ставка монеток:</label>
-            <input type="number" id="mines-bet" value="50" min="10">
-        </div>
-        <div class="input-group">
-            <label>Количество мин (1-24):</label>
-            <input type="number" id="mines-count" value="3" min="1" max="24">
-        </div>
-        <button id="mines-start-btn" class="btn" onclick="startMines()">Начать игру</button>
-        <button id="mines-cashout-btn" class="btn btn-success" style="display:none;" onclick="cashoutMines()">Забрать куш</button>
+    <!-- Информационная панель во время игры -->
+    <div class="status-box" id="status-text">Укажите ставку и начните раунд</div>
+
+    <!-- Игровое поле 5х5 -->
+    <div class="grid" id="minefield">
+        <!-- Клетки генерируются через JavaScript -->
+    </div>
+
+    <!-- Кнопка Кэшаута -->
+    <button class="btn-main" id="cashout-btn" style="display: none; background-color: #2ecc71; color: white;" onclick="claimCashout()">
+        Забрать деньги
+    </button>
+
+    <script>
+        // !!! ВПИШИТЕ СЮДА ВАШ IP ИЗ TERMUX !!!
+        const SERVER_URL = "http://10.25.118.157:8000";
         
-        <div id="mines-status" class="status-box">Укажите ставку и количество мин.</div>
-        <div class="mines-grid" id="mines-board"></div>
-    </div>
+        // Временный ID игрока (в будущем сюда можно привязать реальный ID из Telegram WebApp)
+        const USER_ID = "user_123"; 
 
-    <!-- ЭКРАН 3: ОРЁЛ И РЕШКА -->
-    <div id="game-coin" class="screen">
-        <button class="btn btn-secondary" onclick="showScreen('lobby')">⬅ В лобби</button>
-        <h3>🪙 Орёл или Решка</h3>
-        <div class="input-group">
-            <label>Ставка монеток:</label>
-            <input type="number" id="coin-bet" value="50" min="10">
-        </div>
-        <div class="coin-options">
-            <button id="opt-orel" class="opt-btn selected" onclick="selectCoinSide('orel')">Орёл</button>
-            <button id="opt-reshka" class="opt-btn" onclick="selectCoinSide('reshka')">Решка</button>
-        </div>
-        <div class="coin-flip-zone">
-Используйте код с осторожностью.
-🦅
+        let isGameActive = false;
 
-Бросить монету
-Сделайте ваш выбор и бросайте!
-⬅ В лобби
-🃏 Блэкджек (Классический)
-Ставка монеток:
-Раздать карты
-Дилер (Счёт: ?)
+        // Генерация пустого поля при загрузке страницы
+        function createField() {
+            const field = document.getElementById('minefield');
+            field.innerHTML = '';
+            for (let i = 0; i < 25; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell disabled';
+                cell.id = `cell-${i}`;
+                cell.innerText = '·';
+                cell.setAttribute('onclick', `clickCell(${i})`);
+                field.appendChild(cell);
+            }
+        }
 
+        // Запуск новой игры (Списание ставки)
+        function startNewGame() {
+            const bet = document.getElementById('bet-input').value;
+            const minesCount = document.getElementById('mines-input').value;
 
+            fetch(`${SERVER_URL}/api/mines/start`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: USER_ID,
+                    bet: parseInt(bet),
+                    mines_count: parseInt(minesCount)
+                })
+            })
+            .then(res => {
+                if (!res.ok) return res.json().then(err => { throw new Error(err.detail) });
+                return res.json();
+            })
+            .then(data => {
+                // Обновляем баланс, полученный от сервера Termux
+                document.getElementById('balance').innerText = data.new_balance;
+                document.getElementById('status-text').innerText = "🎰 Игра началась! Ищите кристаллы.";
+                
+                // Переключаем интерфейс в активное состояние
+                isGameActive = true;
+                document.getElementById('setup-panel').style.display = 'none';
+                document.getElementById('cashout-btn').style.display = 'block';
+                document.getElementById('cashout-btn').innerText = `Забрать ${bet} SB`;
 
-Вы (Счёт: 0)
+                // Активируем клетки поля
+                for (let i = 0; i < 25; i++) {
+                    const cell = document.getElementById(`cell-${i}`);
+                    cell.className = 'cell';
+                    cell.innerText = '·';
+                }
+            })
+            .catch(err => {
+                alert(err.message);
+            });
+        }
 
+        // Клик по ячейке
+        function clickCell(index) {
+            if (!isGameActive) return;
+            const cell = document.getElementById(`cell-${index}`);
+            if (cell.classList.contains('opened-gem')) return; // защита от повторного клика
 
+            fetch(`${SERVER_URL}/api/mines/click`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    user_id: USER_ID,
+                    cell_index: index
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'continue') {
+                    // Угадал безопасную клетку
+                    cell.className = 'cell opened-gem disabled';
+                    cell.innerText = '💎';
+                    document.getElementById('status-text').innerText = `Множитель: ${data.multiplier}x | Текущий куш: ${data.current_win} SB`;
+                    document.getElementById('cashout-btn').innerText = `Забрать ${data.current_win} SB`;
+                } 
+                else if (data.status === 'game_over') {
+                    // Напоролся на мину — ПРОИГРЫШ
+                    cell.className = 'cell opened-mine disabled';
+                    cell.innerText = '💥';
+                    endGame(false, data.message);
+                    
+                    // Показываем, где были остальные мины
+                    data.mines.forEach(mineIdx => {
+                        const mCell = document.getElementById(`cell-${mineIdx}`);
+                        if (mCell.innerText !== '💥') {
+                            mCell.className = 'cell opened-mine disabled';
+                            mCell.innerText = '💣';
+                        }
+                    });
+                } 
+                else if (data.status === 'win') {
+                    // Идеальное прохождение (открыл все кристаллы)
+                    cell.className = 'cell opened-gem disabled';
+                    cell.innerText = '💎';
+                    document.getElementById('balance').innerText = data.new_balance;
+                    endGame(true, `🏆 Победа! Вы забрали всё поле и выиграли ${data.win_amount} SB!`);
+                }
+            });
+        }
 
-Взять
-Хватит
+        // Кэшаут (Забрать текущие деньги)
+        function claimCashout() {
+            fetch(`${SERVER_URL}/api/mines/cashout`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: USER_ID })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('balance').innerText = data.new_balance;
+                endGame(true, `💰 Вы успешно забрали ${data.win_amount} SB Coins!`);
+            });
+        }
 
-
-Ждём ставку...
-⬅ В лобби
-🔥 Русское 21 очко
-(Играется колодой из 36 карт, другие стоимости тузов)
-Ставка монеток:
-Начать партию
-Банкир (Счёт: ?)
-
-
-
-Вы (Счёт: 0)
-
-
-
-Ещё карту
-Себе
-
-
-Сделайте ставку для игры по правилам 36-карточной колоды.
-const tg = window.Telegram.WebApp;
-if(tg) { tg.expand(); }
-// Общая система баланса
-let balance = parseInt(localStorage.getItem('casino_balance_v2')) || 2000;
-function updateUIBalance() {
-document.getElementById('user-balance').innerText = balance;
-localStorage.setItem('casino_balance_v2', balance);
-}
-function resetGlobalBalance() {
-balance = 2000;
-updateUIBalance();
-alert("Ваш баланс восстановлен до 2000 демо-монет!");
-}
-updateUIBalance();
-// Навигация экранов
-function showScreen(screenId) {
-document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-document.getElementById(screenId).classList.add('active');
-}
-function triggerVibe(type = 'light') {
-if (tg && tg.HapticFeedback) {
-if(type === 'success') tg.HapticFeedback.notificationOccurred('success');
-else if(type === 'error') tg.HapticFeedback.notificationOccurred('error');
-else tg.HapticFeedback.impactOccurred('light');
-}
-}
-// ==========================================
-// 1. ИГРА: МИНЫ
-// ==========================================
-let minesGameState = { active: false, board: [], bet: 0, count: 0, opened: 0 };
-function initMines() {
-showScreen('game-mines');
-document.getElementById('mines-board').innerHTML = '';
-}
-function startMines() {
-let betInput = document.getElementById('mines-bet');
-let countInput = document.getElementById('mines-count');
-let currentBet = parseInt(betInput.value);
-let mineCount = parseInt(countInput.value);
-if (currentBet > balance || currentBet <= 0) { alert("Неверная ставка!"); return; }
-if (mineCount < 1 || mineCount > 24) { alert("Мин должно быть от 1 до 24!"); return; }
-balance -= currentBet;
-updateUIBalance();
-triggerVibe();
-minesGameState = { active: true, board: Array(25).fill(0), bet: currentBet, count: mineCount, opened: 0 };
-// Раскидываем мины случайным образом
-let placed = 0;
-while (placed < mineCount) {
-let idx = Math.floor(Math.random() * 25);
-if (minesGameState.board[idx] === 0) { minesGameState.board[idx] = 'M'; placed++; }
-}
-document.getElementById('mines-start-btn').style.display = 'none';
-document.getElementById('mines-cashout-btn').style.display = 'block';
-betInput.disabled = true; countInput.disabled = true;
-renderMinesBoard();
-updateMinesStatus();
-}
-function renderMinesBoard() {
-let boardEl = document.getElementById('mines-board');
-boardEl.innerHTML = '';
-for (let i = 0; i < 25; i++) {
-let cell = document.createElement('div');
-cell.className = 'mine-cell';
-cell.dataset.index = i;
-cell.onclick = () => clickMineCell(i);
-boardEl.appendChild(cell);
-}
-}
-function clickMineCell(idx) {
-if (!minesGameState.active) return;
-let cells = document.querySelectorAll('.mine-cell');
-let cell = cells[idx];
-if (cell.classList.contains('opened')) return;
-if (minesGameState.board[idx] === 'M') {
-// Взрыв!
-minesGameState.active = false;
-triggerVibe('error');
-revealMinesField(true);
-document.getElementById('mines-status').innerText = 💥 БУМ! Вы подорвались на мине. Потеряно: ${minesGameState.bet} монеток.;
-endMinesGame();
-} else {
-// Безопасно
-minesGameState.opened++;
-cell.classList.add('opened');
-cell.innerText = '💎';
-triggerVibe();
-updateMinesStatus();
-if (minesGameState.opened === (25 - minesGameState.count)) {
-cashoutMines();
-}
-}
-}
-function calculateMinesMultiplier() {
-// Математический расчет коэффициента с маржой казино
-let n = 25;
-let m = minesGameState.count;
-let o = minesGameState.opened;
-if(o === 0) return 1;
-let mult = 1;
-for(let i = 0; i < o; i++) {
-mult *= (n - i) / (n - m - i);
-}
-return Math.min(mult * 0.96, 1000).toFixed(2); // 0.96 — маржа казино
-}
-function updateMinesStatus() {
-if (!minesGameState.active) return;
-let mult = calculateMinesMultiplier();
-let currentWin = Math.floor(minesGameState.bet * mult);
-document.getElementById('mines-status').innerHTML = Кристаллов найдено: ${minesGameState.opened} | Текущий множитель: <span style="color:var(--success-color)">x${mult}</span> (${currentWin} 🪙);
-}
-function cashoutMines() {
-if (!minesGameState.active || minesGameState.opened === 0) return;
-minesGameState.active = false;
-let mult = calculateMinesMultiplier();
-let winAmount = Math.floor(minesGameState.bet * mult);
-balance += winAmount;
-updateUIBalance();
-triggerVibe('success');
-revealMinesField(false);
-document.getElementById('mines-status').innerHTML = 🎉 Вы забрали <span style="color:var(--success-color)">${winAmount}</span> монеток! (Множитель x${mult});
-endMinesGame();
-}
-function revealMinesField(exploded) {
-let cells = document.querySelectorAll('.mine-cell');
-for (let i = 0; i < 25; i++) {
-if (minesGameState.board[i] === 'M') {
-cells[i].innerText = '💣';
-if(exploded) cells[i].classList.add('exploded');
-} else if (!cells[i].classList.contains('opened')) {
-cells[i].innerText = '💎';
-cells[i].style.opacity = '0.5';
-}
-}
-}
-function endMinesGame() {
-document.getElementById('mines-start-btn').style.display = 'block';
-document.getElementById('mines-cashout-btn').style.display = 'none';
-document.getElementById('mines-bet').disabled = false;
-document.getElementById('mines-count').disabled = false;
-}
-// ==========================================
-// 2. ИГРА: ОРЁЛ И РЕШКА
-// ==========================================
-let selectedCoinSide = 'orel';
-function initCoinFlip() { showScreen('game-coin'); }
-function selectCoinSide(side) {
-selectedCoinSide = side;
-document.getElementById('opt-orel').classList.toggle('selected', side === 'orel');
-document.getElementById('opt-reshka').classList.toggle('selected', side === 'reshka');
-triggerVibe();
-}
-function playCoinFlip() {
-let bet = parseInt(document.getElementById('coin-bet').value);
-if (bet > balance || bet <= 0) { alert("Неверная ставка!"); return; }
-balance -= bet;
-updateUIBalance();
-let coinEl = document.getElementById('visual-coin');
-let statusEl = document.getElementById('coin-status');
-statusEl.innerText = "Монета крутится...";
-// Имитация кручения анимацией вращения текста
-let sideResult = Math.random() < 0.5 ? 'orel' : 'reshka';
-let degrees = sideResult === 'orel' ? 360 : 540;
-coinEl.style.transform = rotateY(${degrees}deg);
-setTimeout(() => {
-coinEl.innerText = sideResult === 'orel' ? '🦅' : '🪙';
-if (selectedCoinSide === sideResult) {
-let win = bet * 1.95; // Выигрыш с маржой
-balance += Math.floor(win);
-statusEl.innerHTML = 🎉 Вы угадали! Получено <span style="color:var(--success-color)">${Math.floor(win)}</span> монет.;
-triggerVibe('success');
-} else {
-statusEl.innerText = 😢 Не угадали! Выпал(а) ${sideResult === 'orel' ? 'Орёл' : 'Решка'}.;
-triggerVibe('error');
-}
-updateUIBalance();
-}, 500);
-}
-// ==========================================
-// ОБЩИЙ КАРТОЧНЫЙ ДВИЖОК ДЛЯ BJ И 21
-// ==========================================
-const suits = ['♠', '♥', '♦', '♣'];
-const valuesBJ = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
-const values21 = ['6','7','8','9','10','J','Q','K','A']; // Для русского 21 очка
-function createDeck(type) {
-let deck = [];
-let vals = type === 'bj' ? valuesBJ : values21;
-for(let s of suits) {
-for(let v of vals) {
-deck.push({ value: v, suit: s });
-}
-}
-// Шаффл (перемешивание)
-for(let i = deck.length - 1; i > 0; i--) {
-let j = Math.floor(Math.random() * (i + 1));
-[deck[i], deck[j]] = [deck[j], deck[i]];
-}
-return deck;
-}
-function renderCardHTML(card) {
-let isRed = card.suit === '♥' || card.suit === '♦';
-return <div class="card ${isRed ? 'red' : ''}"><div>${card.value}</div><div style="align-self:flex-end;">${card.suit}</div></div>;
-}
-// ==========================================
-// 3. ИГРА: БЛЭКДЖЕК (КЛАССИКА)
-// ==========================================
-let bjDeck, bjPlayerHand, bjDealerHand, bjBetAmount;
-function initBlackjack() {
-showScreen('game-blackjack');
-document.getElementById('bj-input-area').style.display = 'block';
-document.getElementById('bj-play-area').style.display = 'none';
-}
-function getBJScore(hand) {
-let score = 0;
-let aces = 0;
-for(let card of hand) {
-if(['J','Q','K'].includes(card.value)) score += 10;
-else if(card.value === 'A') { score += 11; aces++; }
-else score += parseInt(card.value);
-}
-while(score > 21 && aces > 0) { score -= 10; aces--; }
-return score;
-}
-function startBlackjack() {
-bjBetAmount = parseInt(document.getElementById('bj-bet').value);
-if(bjBetAmount > balance || bjBetAmount <= 0) { alert("Неверная ставка!"); return; }
-balance -= bjBetAmount; updateUIBalance(); triggerVibe();
-bjDeck = createDeck('bj');
-bjPlayerHand = [bjDeck.pop(), bjDeck.pop()];
-bjDealerHand = [bjDeck.pop(), bjDeck.pop()];
-document.getElementById('bj-input-area').style.display = 'none';
-document.getElementById('bj-play-area').style.display = 'block';
-renderBJ();
-let pScore = getBJScore(bjPlayerHand);
-if(pScore === 21) {
-blackjackStand(); // Авто-стоп при Блэкджеке с раздачи
-} else {
-document.getElementById('bj-status').innerText = "Ход игрока: Взять ещё или Хватит?";
-}
-}
-function renderBJ(revealDealer = false) {
-document.getElementById('bj-player-cards').innerHTML = bjPlayerHand.map(renderCardHTML).join('');
-document.getElementById('bj-player-score').innerText = getBJScore(bjPlayerHand);
-if(revealDealer) {
-document.getElementById('bj-dealer-cards').innerHTML = bjDealerHand.map(renderCardHTML).join('');
-document.getElementById('bj-dealer-score').innerText = getBJScore(bjDealerHand);
-} else {
-// Прячем вторую карту дилера в классическом Блэкджеке
-document.getElementById('bj-dealer-cards').innerHTML = renderCardHTML(bjDealerHand[0]) + <div class="card" style="background:#444; color:#444;">?</div>;
-document.getElementById('bj-dealer-score').innerText = "?";
-}
-}
-function blackjackHit() {
-bjPlayerHand.push(bjDeck.pop());
-triggerVibe();
-let pScore = getBJScore(bjPlayerHand);
-renderBJ();
-if(pScore > 21) {
-renderBJ(true);
-document.getElementById('bj-
+        // Завершение раунда и возврат к ставкам
+        function endGame(isWin, message) {
+            isGameActive = false;
+            document.getElementById('status-text').innerText = message;
+        
