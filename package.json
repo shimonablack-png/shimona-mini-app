@@ -1,9 +1,9 @@
 
 {
   "name": "shimona-casino",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "SHIMONA CASINO — виртуальные SB",
+  "description": "SHIMONA Casino virtual SB arcade",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
